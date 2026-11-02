@@ -6,6 +6,10 @@
 #define KEYBOARD_MODE 0
 #endif
 
+#ifndef KEYBOARD_LAYOUT
+#define KEYBOARD_LAYOUT 0
+#endif
+
 #ifndef HOSTNAME
 #define HOSTNAME "esp32-keyboard"
 #endif

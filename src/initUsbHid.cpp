@@ -1,15 +1,14 @@
 #include <Arduino.h>
 
-#include "usb/usb_host.h"
+#include <usb/usb_host.h>
 
-#include "hid_host.h"
-#include "hid_usage_keyboard.h"
-#include "hid_usage_mouse.h"
+#include <hid_host.h>
+#include <hid_usage_keyboard.h>
+#include <hid_usage_mouse.h>
 
+#include "Keyboard.h"
 
 void blink();
-size_t sendAsyncData(const uint8_t *const data, const int length);
-size_t sendAsyncChar(char);
 
 typedef struct {
   hid_host_device_handle_t hid_device_handle;
@@ -19,7 +18,7 @@ typedef struct {
 
 QueueHandle_t hid_host_event_queue;
 
-void hid_host_keyboard_report_callback(const uint8_t *const data, const int length) {
+void hid_host_keyboard_report_callback(Keyboard* keyboard, hid_host_device_handle_t hid_device_handle, const uint8_t *const data, const int length) {
   Serial.print("keyboard[");
   Serial.print(length);
   Serial.print("]: ");
@@ -32,11 +31,11 @@ void hid_host_keyboard_report_callback(const uint8_t *const data, const int leng
     Serial.printf("ERROR: size does not match %d != %d \r\n", sizeof(hid_keyboard_input_report_boot_t), length);
     return;
   }
-  sendAsyncData(data,length);
+  keyboard->processKeyboardData(data,length);
   blink();
 }
 
-void hid_host_mouse_report_callback(const uint8_t *const data, const int length) {
+void hid_host_mouse_report_callback(Keyboard* keyboad, hid_host_device_handle_t hid_device_handle, const uint8_t *const data, const int length) {
   Serial.print("mouse[");
   Serial.print(length);
   Serial.print("]: ");
@@ -55,6 +54,7 @@ void hid_host_generic_report_callback(const uint8_t *const data, const int lengt
 void hid_host_interface_callback(hid_host_device_handle_t hid_device_handle,
                                  const hid_host_interface_event_t event,
                                  void *arg) {
+  Keyboard* keyboad = (Keyboard*) arg;
   uint8_t data[64] = {0};
   size_t data_length = 0;
   hid_host_dev_params_t dev_params;
@@ -67,9 +67,9 @@ void hid_host_interface_callback(hid_host_device_handle_t hid_device_handle,
 
     if (HID_SUBCLASS_BOOT_INTERFACE == dev_params.sub_class) {
       if (HID_PROTOCOL_KEYBOARD == dev_params.proto) {
-        hid_host_keyboard_report_callback(data, data_length);
+        hid_host_keyboard_report_callback(keyboad, hid_device_handle, data, data_length);
       } else if (HID_PROTOCOL_MOUSE == dev_params.proto) {
-        hid_host_mouse_report_callback(data, data_length);
+        hid_host_mouse_report_callback(keyboad, hid_device_handle, data, data_length);
       }
     } else {
       hid_host_generic_report_callback(data, data_length);
@@ -97,11 +97,12 @@ void hid_host_interface_callback(hid_host_device_handle_t hid_device_handle,
 }
 
 void hid_host_device_event(hid_host_device_handle_t hid_device_handle,
-                           const hid_host_driver_event_t event, void *arg) {
+                           const hid_host_driver_event_t event, void *arg,
+                           Keyboard* keyboard) {
   hid_host_dev_params_t dev_params;
   ESP_ERROR_CHECK(hid_host_device_get_params(hid_device_handle, &dev_params));
   const hid_host_device_config_t dev_config = {
-      .callback = hid_host_interface_callback, .callback_arg = NULL};
+      .callback = hid_host_interface_callback, .callback_arg = keyboard};
 
   Serial.print("hid_host_device_event: ");
   Serial.println(event);
@@ -128,6 +129,7 @@ void hid_host_device_event(hid_host_device_handle_t hid_device_handle,
     }
     ESP_ERROR_CHECK(hid_host_device_start(hid_device_handle));
     Serial.println("hid_host_device_start!");
+    keyboard->setDeviceHandle(hid_device_handle);
     break;
   default:
     break;
@@ -160,12 +162,13 @@ static void usb_lib_task(void *arg) {
 }
 
 void hid_host_task(void *pvParameters) {
+  Keyboard* keyboad = (Keyboard*) pvParameters;
   hid_host_event_queue_t evt_queue;
   hid_host_event_queue = xQueueCreate(10, sizeof(hid_host_event_queue_t));
 
   while (true) {
     if (xQueueReceive(hid_host_event_queue, &evt_queue, pdMS_TO_TICKS(50))) {
-      hid_host_device_event(evt_queue.hid_device_handle, evt_queue.event, evt_queue.arg);
+      hid_host_device_event(evt_queue.hid_device_handle, evt_queue.event, evt_queue.arg, keyboad);
     }
   }
 }
@@ -177,9 +180,10 @@ void hid_host_device_callback(hid_host_device_handle_t hid_device_handle,
   xQueueSend(hid_host_event_queue, &evt_queue, 0);
 }
 
-void setupUsbHid()
+Keyboard* setupUsbHid()
 {
-      BaseType_t task_created;
+  Keyboard* keyboard = new Keyboard;
+  BaseType_t task_created;
 
   task_created =
       xTaskCreatePinnedToCore(usb_lib_task, "usb_events", 4096,
@@ -203,9 +207,10 @@ void setupUsbHid()
   Serial.println("hid_host_install");
 
   task_created =
-      xTaskCreate(&hid_host_task, "hid_task", 4 * 1024, NULL, 2, NULL);
+      xTaskCreate(&hid_host_task, "hid_task", 4 * 1024, keyboard, 2, NULL);
   assert(task_created == pdTRUE);
 
   Serial.println("hid_host_task");
 
+  return keyboard;
 }

@@ -1,11 +1,6 @@
-#include <Arduino.h>
-#include <hid_usage_keyboard.h>
+#include "layout_en.h"
 
-#include <keyboard.h>
-
-#define KEYBOARD_ENTER_MAIN_CHAR '\r' // 40
-
-const uint8_t keycode2ascii[57][2] = {
+const uint8_t keycode2ascii_en[200][3] = {
     {0, 0},                                               /* HID_KEY_NO_PRESS        */
     {0, 0},                                               /* HID_KEY_ROLLOVER        */
     {0, 0},                                               /* HID_KEY_POST_FAIL       */
@@ -67,60 +62,15 @@ const uint8_t keycode2ascii[57][2] = {
     {'/', '?'}                    /* HID_KEY_SLASH           */
 };
 
-Keyboard::Keyboard()
-{
-  memset(keystate, 0, sizeof(keystate));
+bool mapSpecialKeyEN(uint8_t& key) {
+  if(key==HID_KEY_DECIMAL_SEPARATOR) {
+    key = '.';
+    return true;
+  }
+  return false;
 }
 
-uint8_t Keyboard::handleInput(hid_keyboard_input_report_boot_t *input, char* pressedKeys, const size_t pressedKeysMaxLength)
+const TLayout* getLayoutMapEN()
 {
-  Serial.printf("[AsyncServer] convertKBToChar: %d %d %d\r\n", input->modifier, input->reserved, input->key[0]);
-  uint8_t released = 0;
-  for (int ikey = 0; ikey < 256; ikey++)
-  {
-    if (keystate[ikey] != 0)
-    { // was pressed
-      bool found = false;
-      for (int i = 0; i < sizeof(input->key); i++)
-      {
-        uint8_t key = input->key[i];
-        if (key == ikey)
-          found = true;
-      }
-      if (!found)
-      {
-        released = ikey;
-        keystate[ikey] = 0;
-        Serial.printf("[AsyncServer] released: %d\r\n", ikey);
-      }
-    }
-  }
-  uint8_t uppercase = input->modifier.left_shift || input->modifier.right_shift;
-  uint8_t countOfPressedKeys = 0;
-  uint8_t pressed = 0;
-  for (int i = 0; i < sizeof(input->key); i++)
-  {
-    uint8_t key = input->key[i];
-    if (key == 0)
-      continue;
-    if (keystate[key] == 0)
-    {
-      pressed = key;
-      keystate[key] = 1; // pressed
-      Serial.printf("[AsyncServer] pressed: %d\r\n", key);
-      uint8_t pressedKey = 0;
-      if ((pressed >= HID_KEY_A) && (pressed <= HID_KEY_SLASH)) {
-        pressedKey = keycode2ascii[pressed][uppercase];
-        if(countOfPressedKeys<pressedKeysMaxLength) {
-          pressedKeys[countOfPressedKeys]=pressedKey;
-          countOfPressedKeys++;
-        } else {
-          //ignore rest - buffer too small
-        }
-      } else {
-        // ignore
-      }
-    }
-  }
-  return countOfPressedKeys;
+    return &keycode2ascii_en;
 }
