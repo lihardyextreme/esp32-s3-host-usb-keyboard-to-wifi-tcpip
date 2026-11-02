@@ -13,7 +13,7 @@ enum class KeyMapResult : uint8_t {
 
 class KeyboardLayout {
 public:
-  virtual ~KeyboardLayout() {}
+  virtual ~KeyboardLayout();
 
   virtual const char* name() const = 0;
 
@@ -30,34 +30,14 @@ protected:
       uint8_t byte,
       uint8_t* output,
       size_t capacity,
-      size_t& written)
-  {
-    if (written >= capacity) {
-      return false;
-    }
-
-    output[written++] = byte;
-    return true;
-  }
+      size_t& written);
 
   static bool appendBytes(
       const uint8_t* bytes,
       size_t length,
       uint8_t* output,
       size_t capacity,
-      size_t& written)
-  {
-    // Check the whole sequence first so escape codes or UTF-8 aren't partial.
-    if (length > capacity - written) {
-      return false;
-    }
-
-    for (size_t i = 0; i < length; ++i) {
-      output[written++] = bytes[i];
-    }
-
-    return true;
-  }
+      size_t& written);
 };
 
 #endif

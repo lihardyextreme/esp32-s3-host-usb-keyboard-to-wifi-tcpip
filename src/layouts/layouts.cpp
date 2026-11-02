@@ -6,9 +6,17 @@
 
 const TLayout* getLayoutMap(int layout)
 {
-    Serial.print("getLayoutMap ");
-    Serial.println(layout);
-    if(layout==0) return getLayoutMapEN();
-    if(layout==1) return getLayoutMapDE();
-    return nullptr;
+  if (layout == LAYOUT_EN) return getLayoutMapEN();
+  if (layout == LAYOUT_DE) return getLayoutMapDE();
+  return nullptr;
+}
+
+const KeyboardLayout* getKeyboardLayout(int layout)
+{
+  static const EnglishKeyboardLayout english;
+  static const GermanKeyboardLayout german;
+
+  if (layout == LAYOUT_EN) return &english;
+  if (layout == LAYOUT_DE) return &german;
+  return nullptr;
 }
