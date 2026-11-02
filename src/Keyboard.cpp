@@ -20,11 +20,15 @@ Keyboard::Keyboard()
 
 int Keyboard::getLayout()
 {
+  if(theServerContext==nullptr)
+    return KEYBOARD_LAYOUT;
   return theServerContext->getLayout();
 }
 
 void Keyboard::setLayout(int layout)
 {
+  if(theServerContext==nullptr)
+    return;
   theServerContext->setLayout(layout);
 }
 
@@ -207,6 +211,8 @@ void Keyboard::applyLedState()
 }
 
 size_t Keyboard::processKeyboardData(const uint8_t *const data, const int length) {
+  if(theServerContext==nullptr)
+    return 0;
   if(theServerContext->getMode()==2) {
     char pressedKeys[6];
     uint8_t count = handleInput((hid_keyboard_input_report_boot_t*)data, pressedKeys, sizeof(pressedKeys));
