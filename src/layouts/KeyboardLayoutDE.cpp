@@ -1,3 +1,4 @@
+#include <hid_usage_keyboard.h>
 #include "KeyboardLayoutDE.h"
 
 const char* GermanKeyboardLayout::name() const
@@ -45,8 +46,8 @@ KeyMapResult GermanKeyboardLayout::mapKey(
         else value = shifted ? '=' : '0';
         break;
       case HID_KEY_ENTER: value = '\r'; break;
-      case HID_KEY_ESCAPE: value = 0x1b; break;
-      case HID_KEY_BACKSPACE: value = '\b'; break;
+      // case HID_KEY_ESCAPE: value = 0x1b; break;
+      // case HID_KEY_BACKSPACE: value = '\b'; break;
       case HID_KEY_TAB: value = '\t'; break;
       case HID_KEY_SPACE: value = ' '; break;
       case HID_KEY_MINUS:
@@ -72,28 +73,28 @@ KeyMapResult GermanKeyboardLayout::mapKey(
             ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
       }
       case HID_KEY_CLOSE_BRACKET: value = shifted ? '*' : '+'; break;
-      case HID_KEY_BACKSLASH: value = shifted ? '\\' : '#'; break;
-      case HID_KEY_NONUS_HASH: value = shifted ? '\'' : '<'; break;
-      case HID_KEY_SEMICOLON: {
-        const uint8_t umlaut[] = {0xC3, static_cast<uint8_t>(shifted ? 0x96 : 0xB6)};
-        return appendBytes(umlaut, sizeof(umlaut), output, capacity, written)
-            ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
-      }
-      case HID_KEY_APOSTROPHE: {
-        const uint8_t umlaut[] = {0xC3, static_cast<uint8_t>(shifted ? 0x84 : 0xA4)};
-        return appendBytes(umlaut, sizeof(umlaut), output, capacity, written)
-            ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
-      }
-      case HID_KEY_GRAVE:
-        if (shifted) {
-          static const uint8_t degree[] = {0xC2, 0xB0};
-          return appendBytes(degree, sizeof(degree), output, capacity, written)
-              ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
-        }
-        value = '^';
-        break;
-      case HID_KEY_COMMA: value = shifted ? ';' : ','; break;
-      case HID_KEY_PERIOD: value = shifted ? ':' : '.'; break;
+      // case HID_KEY_BACKSLASH: value = shifted ? '\\' : '#'; break;
+      // case HID_KEY_NONUS_HASH: value = shifted ? '\'' : '<'; break;
+      // case HID_KEY_SEMICOLON: {
+      //   const uint8_t umlaut[] = {0xC3, static_cast<uint8_t>(shifted ? 0x96 : 0xB6)};
+      //   return appendBytes(umlaut, sizeof(umlaut), output, capacity, written)
+      //       ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
+      // }
+      // case HID_KEY_APOSTROPHE: {
+      //   const uint8_t umlaut[] = {0xC3, static_cast<uint8_t>(shifted ? 0x84 : 0xA4)};
+      //   return appendBytes(umlaut, sizeof(umlaut), output, capacity, written)
+      //       ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
+      // }
+      // case HID_KEY_GRAVE:
+      //   if (shifted) {
+      //     static const uint8_t degree[] = {0xC2, 0xB0};
+      //     return appendBytes(degree, sizeof(degree), output, capacity, written)
+      //         ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
+      //   }
+      //   value = '^';
+      //   break;
+      // case HID_KEY_COMMA: value = shifted ? ';' : ','; break;
+      // case HID_KEY_PERIOD: value = shifted ? ':' : '.'; break;
       case HID_KEY_SLASH: value = shifted ? '_' : '-'; break;
       case HID_KEY_KEYPAD_DECIMAL: value = ','; break;
       default: mapped = false; break;
