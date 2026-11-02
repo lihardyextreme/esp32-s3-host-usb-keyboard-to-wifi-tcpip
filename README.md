@@ -19,3 +19,8 @@ password="your-password"
 2. On your PC: connect to server `telnet esp32-keyboard.local 9009'
 3. Type on the keyboard (1) and receive the text in the telnet terminal (2)
 4. In order to disconnect type a dot '.' in the telnet terminal (2)
+
+## Switch kayboard layout
+
+- english (default) - (ctrl) + (alt) + (windows)+e
+- german (deutsch) - (ctrl) + (alt) + (windows)+d
