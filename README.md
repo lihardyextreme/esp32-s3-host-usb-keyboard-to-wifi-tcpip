@@ -22,5 +22,7 @@ password="your-password"
 
 ## Switch kayboard layout
 
-- english (default) - (ctrl) + (alt) + (windows)+e
-- german (deutsch) - (ctrl) + (alt) + (windows)+d
+In order to change the keyboard layout, on the ESP32 keyboard (1) use the following sequences:
+
+- english (default) - (Left-Ctrl) + (Left-Alt) + (Left-Windows-key) + e
+- german (deutsch) - (Left-Ctrl) + (Left-Alt) + (Left-Windows-key) + d
