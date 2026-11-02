@@ -3,6 +3,13 @@
 Connect a USB Keyboard to the USB (not the COM) port of the ESP32 S3 and receive the typed text over TCPIP.
 Note: The USB port should be USB-OTG enabled.
 
+## Build
+
+1. Install PlatformIO in VSCode
+2. git clone https://github.com/lihardyextreme/esp32-s3-host-usb-keyboard-to-wifi-tcpip.git
+3. Open folder of the cloned repository in VSCode
+4. Press Alt+Ctrl+B
+
 ## Configure
 
 Create an additional file *.platform.ini*
