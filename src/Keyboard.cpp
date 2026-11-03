@@ -66,6 +66,10 @@ uint8_t Keyboard::handleInput(hid_keyboard_input_report_boot_t *input, char* pre
   bool magicCombo = input->modifier.left_ctr && input->modifier.left_alt && input->modifier.left_gui;
   if(magicCombo) {
     if(input->key[1]==0) {
+      if(input->key[0]==HID_KEY_PAUSE) {
+        ESP.restart();
+        return 0;
+      }
       if(input->key[0]==HID_KEY_E) {
         setLayout(LAYOUT_EN);
         return 0;
