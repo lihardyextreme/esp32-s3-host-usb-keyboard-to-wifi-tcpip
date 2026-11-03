@@ -23,7 +23,7 @@ public:
       const hid_keyboard_input_report_boot_t& report,
       uint8_t* output,
       size_t capacity,
-      size_t& written) const = 0;
+      size_t& written) const;
 
 protected:
   static bool appendByte(

@@ -17,7 +17,6 @@ KeyMapResult GermanKeyboardLayout::mapKey(
   const bool shifted = report.modifier.left_shift || report.modifier.right_shift;
   const bool altGr = report.modifier.right_alt;
   uint8_t value = 0;
-  bool mapped = true;
 
   if (key >= HID_KEY_A && key <= HID_KEY_Z) {
     value = (shifted ? 'A' : 'a') + (key - HID_KEY_A);
@@ -45,6 +44,7 @@ KeyMapResult GermanKeyboardLayout::mapKey(
         if (altGr) value = '}';
         else value = shifted ? '=' : '0';
         break;
+      case HID_KEY_KEYPAD_ENTER:
       case HID_KEY_ENTER: value = '\r'; break;
       // case HID_KEY_ESCAPE: value = 0x1b; break;
       // case HID_KEY_BACKSPACE: value = '\b'; break;
@@ -67,41 +67,48 @@ KeyMapResult GermanKeyboardLayout::mapKey(
               ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
         }
         break;
-      case HID_KEY_OPEN_BRACKET: {
+      case HID_KEY_OPEN_BRACKET: { // ü
         const uint8_t umlaut[] = {0xC3, static_cast<uint8_t>(shifted ? 0x9C : 0xBC)};
         return appendBytes(umlaut, sizeof(umlaut), output, capacity, written)
             ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
       }
-      case HID_KEY_CLOSE_BRACKET: value = shifted ? '*' : '+'; break;
-      // case HID_KEY_BACKSLASH: value = shifted ? '\\' : '#'; break;
-      // case HID_KEY_NONUS_HASH: value = shifted ? '\'' : '<'; break;
-      // case HID_KEY_SEMICOLON: {
-      //   const uint8_t umlaut[] = {0xC3, static_cast<uint8_t>(shifted ? 0x96 : 0xB6)};
-      //   return appendBytes(umlaut, sizeof(umlaut), output, capacity, written)
-      //       ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
-      // }
-      // case HID_KEY_APOSTROPHE: {
-      //   const uint8_t umlaut[] = {0xC3, static_cast<uint8_t>(shifted ? 0x84 : 0xA4)};
-      //   return appendBytes(umlaut, sizeof(umlaut), output, capacity, written)
-      //       ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
-      // }
-      // case HID_KEY_GRAVE:
-      //   if (shifted) {
-      //     static const uint8_t degree[] = {0xC2, 0xB0};
-      //     return appendBytes(degree, sizeof(degree), output, capacity, written)
-      //         ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
-      //   }
-      //   value = '^';
-      //   break;
-      // case HID_KEY_COMMA: value = shifted ? ';' : ','; break;
-      // case HID_KEY_PERIOD: value = shifted ? ':' : '.'; break;
+      case HID_KEY_CLOSE_BRACKET:
+        if(altGr) value = '~';
+        else value = shifted ? '*' : '+';
+        break;
+      case HID_KEY_SHARP:
+        value = shifted ? '\'' : '#';
+        break;
+      case HID_KEY_KEYPAD_SLASH: // 100
+        if(altGr) value = '|';
+        else value = shifted ? '>' : '<';
+        break;
+      case HID_KEY_COLON: { // ö
+        const uint8_t umlaut[] = {0xC3, static_cast<uint8_t>(shifted ? 0x96 : 0xB6)};
+        return appendBytes(umlaut, sizeof(umlaut), output, capacity, written)
+            ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
+      }
+      case HID_KEY_QUOTE: { // ä
+        const uint8_t umlaut[] = {0xC3, static_cast<uint8_t>(shifted ? 0x84 : 0xA4)};
+        return appendBytes(umlaut, sizeof(umlaut), output, capacity, written)
+            ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
+      }
+      case HID_KEY_TILDE: // top left ^°
+        if (shifted) {
+          static const uint8_t degree[] = {0xC2, 0xB0};
+          return appendBytes(degree, sizeof(degree), output, capacity, written)
+              ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
+        }
+        value = '^';
+        break;
+      case HID_KEY_LESS: value = shifted ? ';' : ','; break;
+      case HID_KEY_GREATER: value = shifted ? ':' : '.'; break;
       case HID_KEY_SLASH: value = shifted ? '_' : '-'; break;
       case HID_KEY_KEYPAD_DECIMAL: value = ','; break;
-      default: mapped = false; break;
+      default:
+        return KeyboardLayout::mapKey(key, report, output, capacity, written);
     }
   }
-
-  if (!mapped) return KeyMapResult::NotMapped;
   return appendByte(value, output, capacity, written)
       ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
 }

@@ -16,7 +16,6 @@ KeyMapResult EnglishKeyboardLayout::mapKey(
   written = 0;
   const bool shifted = report.modifier.left_shift || report.modifier.right_shift;
   uint8_t value = 0;
-  bool mapped = true;
 
   if (key >= HID_KEY_A && key <= HID_KEY_Z) {
     value = (shifted ? 'A' : 'a') + (key - HID_KEY_A);
@@ -27,6 +26,7 @@ KeyMapResult EnglishKeyboardLayout::mapKey(
   } else {
     switch (key) {
       case HID_KEY_0: value = shifted ? ')' : '0'; break;
+      case HID_KEY_KEYPAD_ENTER:
       case HID_KEY_ENTER: value = '\r'; break;
       // case HID_KEY_ESCAPE: value = 0x1b; break;
       // case HID_KEY_BACKSPACE: value = '\b'; break;
@@ -45,11 +45,10 @@ KeyMapResult EnglishKeyboardLayout::mapKey(
       // case HID_KEY_PERIOD: value = shifted ? '>' : '.'; break;
       case HID_KEY_SLASH: value = shifted ? '?' : '/'; break;
       case HID_KEY_KEYPAD_DECIMAL: value = '.'; break;
-      default: mapped = false; break;
+      default:
+        return KeyboardLayout::mapKey(key, report, output, capacity, written);
     }
   }
-
-  if (!mapped) return KeyMapResult::NotMapped;
   return appendByte(value, output, capacity, written)
       ? KeyMapResult::Mapped : KeyMapResult::BufferTooSmall;
 }
