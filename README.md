@@ -12,7 +12,7 @@ Note: The USB port should be USB-OTG enabled.
 
 ## Configure
 
-Create an additional file *.platform.ini*
+Create an additional file *.platformio.ini*
 
 ```
 [wifi]
