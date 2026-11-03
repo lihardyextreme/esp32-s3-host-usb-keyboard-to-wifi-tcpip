@@ -8,8 +8,6 @@
 
 #include "Keyboard.h"
 
-void blink();
-
 typedef struct {
   hid_host_device_handle_t hid_device_handle;
   hid_host_driver_event_t event;
@@ -32,7 +30,6 @@ void hid_host_keyboard_report_callback(Keyboard* keyboard, hid_host_device_handl
     return;
   }
   keyboard->processKeyboardData(data,length);
-  blink();
 }
 
 void hid_host_mouse_report_callback(Keyboard* keyboad, hid_host_device_handle_t hid_device_handle, const uint8_t *const data, const int length) {
@@ -44,7 +41,6 @@ void hid_host_mouse_report_callback(Keyboard* keyboad, hid_host_device_handle_t 
     Serial.print(",");
   }
   Serial.println(".");
-  blink();
 }
 
 void hid_host_generic_report_callback(const uint8_t *const data, const int length) {
