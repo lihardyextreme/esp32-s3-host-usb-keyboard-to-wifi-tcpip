@@ -35,4 +35,5 @@ public:
   void applyLedState();
   size_t processKeyboardData(const uint8_t *const data, const int length);
 };
+
 #endif
