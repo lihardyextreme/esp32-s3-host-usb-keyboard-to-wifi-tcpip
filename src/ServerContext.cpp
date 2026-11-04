@@ -8,11 +8,10 @@ ServerContext::ServerContext()
   mode = KEYBOARD_MODE;
 }
 
-void ServerContext::setServer(AsyncServer* server)
+void ServerContext::setServer(AsyncServer *server)
 {
   this->server = server;
 }
-
 
 void ServerContext::resetMode()
 {
@@ -21,7 +20,7 @@ void ServerContext::resetMode()
 
 void ServerContext::setMode(int mode)
 {
-  Serial.printf("-->> setMode %d \r\n",mode);
+  Serial.printf("-->> setMode %d \r\n", mode);
   this->mode = mode;
 }
 
@@ -37,22 +36,24 @@ int ServerContext::getLayout()
 
 void ServerContext::setLayout(int layout)
 {
-  Serial.printf("-->> setLayout %d \r\n",mode);
+  Serial.printf("-->> setLayout %d \r\n", mode);
   this->layout = layout;
 }
 
-void ServerContext::setClient(AsyncClient* client)
+void ServerContext::setClient(AsyncClient *client)
 {
   this->client = client;
 }
 
-AsyncClient* ServerContext::getClient()
+AsyncClient *ServerContext::getClient()
 {
   return this->client;
 }
 
-size_t ServerContext::sendAsyncString(const char* data) {
-  if(this->client==nullptr) {
+size_t ServerContext::sendAsyncString(const char *data)
+{
+  if (this->client == nullptr)
+  {
     Serial.println("[AsyncServer] sendAsyncString - ignore");
     return 0;
   }
@@ -63,7 +64,8 @@ size_t ServerContext::sendAsyncString(const char* data) {
 
 size_t ServerContext::writeBytes(const char *data, size_t size)
 {
-  if(client==nullptr) {
+  if (client == nullptr)
+  {
     Serial.println("[AsyncServer] sendAsyncString - ignore");
     return 0;
   }
