@@ -131,10 +131,8 @@ uint8_t Keyboard::handleInput(hid_keyboard_input_report_boot_t *input, uint8_t *
       {
         if (keyboardLayout->premapKey(stateNumLock, pressed, input, pressedKeys, countOfPressedKeys, pressedKeysMaxLength))
           continue;
-        size_t written = 0;
-        if (KeyMapResult::BufferTooSmall == keyboardLayout->mapKey(pressed, *input, pressedKeys + countOfPressedKeys, pressedKeysMaxLength, written))
+        if (KeyMapResult::BufferTooSmall == keyboardLayout->mapKey(pressed, *input, pressedKeys, pressedKeysMaxLength, countOfPressedKeys))
           return countOfPressedKeys;
-        countOfPressedKeys += written;
       }
     }
   }
