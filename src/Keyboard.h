@@ -11,7 +11,7 @@
 class Keyboard
 {
 private:
-  ServerContext* theServerContext;
+  ServerContext *theServerContext;
   hid_host_device_handle_t hid_device_handle;
   uint8_t keystate[256];
 
@@ -26,18 +26,14 @@ public:
   int getLayout();
   void setLayout(int layout);
 
-  void setServerContext(ServerContext* context);
+  void setServerContext(ServerContext *context);
   void setDeviceHandle(hid_host_device_handle_t hid_device_handle);
   uint8_t handleInput(hid_keyboard_input_report_boot_t *input,
-    char* pressedKeys, const size_t pressedKeysMaxLength);
+                      uint8_t *pressedKeys, size_t pressedKeysMaxLength);
   void requestLedState(bool capslock, bool numlock, bool scroll);
   void _requestLedState(uint8_t state);
   void applyLedState();
   size_t processKeyboardData(const uint8_t *const data, const int length);
-
-private:
-  bool premapKey(uint8_t& key, hid_keyboard_input_report_boot_t *input, char *pressedKeys, size_t &countOfPressedKeys, const size_t pressedKeysMaxLength);
-
 };
 
 #endif

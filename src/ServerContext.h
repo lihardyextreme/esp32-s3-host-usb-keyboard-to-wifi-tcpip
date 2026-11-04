@@ -6,17 +6,15 @@
 class ServerContext
 {
 private:
-
   int mode;
   int layout;
   AsyncClient *client = nullptr;
-  AsyncServer* server = nullptr;
+  AsyncServer *server = nullptr;
 
 public:
-
   ServerContext();
 
-  void setServer(AsyncServer* server);
+  void setServer(AsyncServer *server);
 
   void resetMode();
   void setMode(int mode);
@@ -25,10 +23,10 @@ public:
   int getLayout();
   void setLayout(int layout);
 
-  void setClient(AsyncClient* client);
-  AsyncClient* getClient();
-  
-  size_t sendAsyncString(const char* data);
+  void setClient(AsyncClient *client);
+  AsyncClient *getClient();
+
+  size_t sendAsyncString(const char *data);
   size_t writeBytes(const char *data, size_t size);
 };
 

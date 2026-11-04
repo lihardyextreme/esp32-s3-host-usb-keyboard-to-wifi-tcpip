@@ -4,40 +4,45 @@
 #include "ServerContext.h"
 #include "Keyboard.h"
 
-Keyboard* keyboard = nullptr;
-ServerContext* theServerContext = nullptr;
-void setupWiFi(Keyboard*);
-ServerContext * setupServerContext();
-Keyboard* setupUsbHid();
+Keyboard *keyboard = nullptr;
+ServerContext *theServerContext = nullptr;
+void setupWiFi(Keyboard *);
+ServerContext *setupServerContext();
+Keyboard *setupUsbHid();
 
 void blinkKeyboardLeds()
 {
-  if(keyboard==nullptr) return;
-  keyboard->requestLedState(true,true,true);
+  if (keyboard == nullptr)
+    return;
+  keyboard->requestLedState(true, true, true);
   delay(10);
   keyboard->applyLedState();
   delay(300);
-  keyboard->requestLedState(false,false,false);
+  keyboard->requestLedState(false, false, false);
   delay(10);
   keyboard->applyLedState();
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   Serial.println("setup");
   keyboard = setupUsbHid();
-  keyboard->requestLedState(false,false,false);
+  keyboard->requestLedState(false, false, false);
   setupWiFi(keyboard);
   blinkKeyboardLeds();
   theServerContext = setupServerContext();
   keyboard->setServerContext(theServerContext);
 }
 
-int loops=0;
+int loops = 0;
 
-void loop() {
-  if(keyboard==nullptr) return;
-  for(int i=0;i<100;i++) {
+void loop()
+{
+  if (keyboard == nullptr)
+    return;
+  for (int i = 0; i < 100; i++)
+  {
     delay(10);
     keyboard->applyLedState();
   }
