@@ -24,7 +24,7 @@ KeyMapResult GermanKeyboardLayout::mapKey(
     if (key == HID_KEY_Z) value = shifted ? 'Y' : 'y';
   } else if (key >= HID_KEY_1 && key <= HID_KEY_9) {
     static const char normal[] = "123456789";
-    static const char upper[] = "!\"§$%&/ (";
+    static const char upper[] = "!\"X$%&/()";
     if (key == HID_KEY_3 && shifted) {
       static const uint8_t section[] = {0xC2, 0xA7};
       return appendBytes(section, sizeof(section), output, capacity, written)
@@ -34,22 +34,12 @@ KeyMapResult GermanKeyboardLayout::mapKey(
     else if (key == HID_KEY_8 && altGr) value = '[';
     else if (key == HID_KEY_9 && altGr) value = ']';
     else value = shifted ? upper[key - HID_KEY_1] : normal[key - HID_KEY_1];
-    // Correct German shifted number-row values for 7, 8 and 9.
-    if (shifted && key == HID_KEY_7) value = '/';
-    if (shifted && key == HID_KEY_8) value = '(';
-    if (shifted && key == HID_KEY_9) value = ')';
   } else {
     switch (key) {
       case HID_KEY_0:
         if (altGr) value = '}';
         else value = shifted ? '=' : '0';
         break;
-      case HID_KEY_KEYPAD_ENTER:
-      case HID_KEY_ENTER: value = '\r'; break;
-      // case HID_KEY_ESCAPE: value = 0x1b; break;
-      // case HID_KEY_BACKSPACE: value = '\b'; break;
-      case HID_KEY_TAB: value = '\t'; break;
-      case HID_KEY_SPACE: value = ' '; break;
       case HID_KEY_MINUS:
         if (shifted) value = '?';
         else if (altGr) value = '\\';

@@ -34,6 +34,10 @@ public:
   void _requestLedState(uint8_t state);
   void applyLedState();
   size_t processKeyboardData(const uint8_t *const data, const int length);
+
+private:
+  bool premapKey(uint8_t& key, hid_keyboard_input_report_boot_t *input, char *pressedKeys, size_t &countOfPressedKeys, const size_t pressedKeysMaxLength);
+
 };
 
 #endif
