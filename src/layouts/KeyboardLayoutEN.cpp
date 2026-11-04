@@ -26,23 +26,16 @@ KeyMapResult EnglishKeyboardLayout::mapKey(
   } else {
     switch (key) {
       case HID_KEY_0: value = shifted ? ')' : '0'; break;
-      case HID_KEY_KEYPAD_ENTER:
-      case HID_KEY_ENTER: value = '\r'; break;
-      // case HID_KEY_ESCAPE: value = 0x1b; break;
-      // case HID_KEY_BACKSPACE: value = '\b'; break;
-      case HID_KEY_TAB: value = '\t'; break;
-      case HID_KEY_SPACE: value = ' '; break;
       case HID_KEY_MINUS: value = shifted ? '_' : '-'; break;
       case HID_KEY_EQUAL: value = shifted ? '+' : '='; break;
       case HID_KEY_OPEN_BRACKET: value = shifted ? '{' : '['; break;
       case HID_KEY_CLOSE_BRACKET: value = shifted ? '}' : ']'; break;
-      // case HID_KEY_BACKSLASH: value = shifted ? '|' : '\\'; break;
-      // case HID_KEY_NONUS_HASH: value = shifted ? '|' : '\\'; break;
-      // case HID_KEY_SEMICOLON: value = shifted ? ':' : ';'; break;
-      // case HID_KEY_APOSTROPHE: value = shifted ? '"' : '\''; break;
-      // case HID_KEY_GRAVE: value = shifted ? '~' : '`'; break;
-      // case HID_KEY_COMMA: value = shifted ? '<' : ','; break;
-      // case HID_KEY_PERIOD: value = shifted ? '>' : '.'; break;
+      case HID_KEY_SHARP: value = shifted ? '|' : '\\'; break;
+      case HID_KEY_COLON: value = shifted ? ':' : ';'; break;
+      case HID_KEY_QUOTE: value = shifted ? '"' : '\''; break;
+      case HID_KEY_TILDE: value = shifted ? '~' : '`'; break;
+      case HID_KEY_LESS: value = shifted ? '<' : ','; break;
+      case HID_KEY_GREATER: value = shifted ? '>' : '.'; break;
       case HID_KEY_SLASH: value = shifted ? '?' : '/'; break;
       case HID_KEY_KEYPAD_DECIMAL: value = '.'; break;
       default:

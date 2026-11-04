@@ -11,7 +11,7 @@
 typedef struct {
   hid_host_device_handle_t hid_device_handle;
   hid_host_driver_event_t event;
-  void *arg;
+  Keyboard *keyboard;
 } hid_host_event_queue_t;
 
 QueueHandle_t hid_host_event_queue;
@@ -49,8 +49,8 @@ void hid_host_generic_report_callback(const uint8_t *const data, const int lengt
 
 void hid_host_interface_callback(hid_host_device_handle_t hid_device_handle,
                                  const hid_host_interface_event_t event,
-                                 void *arg) {
-  Keyboard* keyboad = (Keyboard*) arg;
+                                 void *argKeyboard) {
+  Keyboard* keyboad = (Keyboard*) argKeyboard;
   uint8_t data[64] = {0};
   size_t data_length = 0;
   hid_host_dev_params_t dev_params;
@@ -93,8 +93,8 @@ void hid_host_interface_callback(hid_host_device_handle_t hid_device_handle,
 }
 
 void hid_host_device_event(hid_host_device_handle_t hid_device_handle,
-                           const hid_host_driver_event_t event, void *arg,
-                           Keyboard* keyboard) {
+                           const hid_host_driver_event_t event, void *pKeyboard) {
+  Keyboard* keyboard = (Keyboard*)pKeyboard;
   hid_host_dev_params_t dev_params;
   ESP_ERROR_CHECK(hid_host_device_get_params(hid_device_handle, &dev_params));
   const hid_host_device_config_t dev_config = {
@@ -132,8 +132,8 @@ void hid_host_device_event(hid_host_device_handle_t hid_device_handle,
   }
 }
 
-static void usb_lib_task(void *arg) {
-
+static void usb_lib_task(void *arg)
+{
   const usb_host_config_t host_config = {
       .skip_phy_setup = false,
       .intr_flags = ESP_INTR_FLAG_LEVEL1,
@@ -158,21 +158,23 @@ static void usb_lib_task(void *arg) {
 }
 
 void hid_host_task(void *pvParameters) {
-  Keyboard* keyboad = (Keyboard*) pvParameters;
-  hid_host_event_queue_t evt_queue;
-  hid_host_event_queue = xQueueCreate(10, sizeof(hid_host_event_queue_t));
+  hid_host_event_queue_t evt_queue = {
+      .keyboard = (Keyboard*) pvParameters
+  };
 
+  hid_host_event_queue = xQueueCreate(10, sizeof(hid_host_event_queue_t));
   while (true) {
     if (xQueueReceive(hid_host_event_queue, &evt_queue, pdMS_TO_TICKS(50))) {
-      hid_host_device_event(evt_queue.hid_device_handle, evt_queue.event, evt_queue.arg, keyboad);
+      hid_host_device_event(evt_queue.hid_device_handle, evt_queue.event, evt_queue.keyboard);
     }
   }
 }
 
 void hid_host_device_callback(hid_host_device_handle_t hid_device_handle,
-                              const hid_host_driver_event_t event, void *arg) {
+                              const hid_host_driver_event_t event, void *keyboard)
+{
   const hid_host_event_queue_t evt_queue = {
-      .hid_device_handle = hid_device_handle, .event = event, .arg = arg};
+      .hid_device_handle = hid_device_handle, .event = event, .keyboard = (Keyboard*)keyboard};
   xQueueSend(hid_host_event_queue, &evt_queue, 0);
 }
 
@@ -196,7 +198,8 @@ Keyboard* setupUsbHid()
       .stack_size = 4096,
       .core_id = 0,
       .callback = hid_host_device_callback,
-      .callback_arg = NULL};
+      .callback_arg = keyboard
+    };
 
   ESP_ERROR_CHECK(hid_host_install(&hid_host_driver_config));
 
