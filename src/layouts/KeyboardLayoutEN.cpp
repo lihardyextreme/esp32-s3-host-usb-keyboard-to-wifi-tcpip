@@ -6,14 +6,11 @@ const char *EnglishKeyboardLayout::name() const
   return "English (US)";
 }
 
-KeyMapResult EnglishKeyboardLayout::mapKey(
+bool EnglishKeyboardLayout::mapKey(
     uint8_t key,
     const hid_keyboard_input_report_boot_t &report,
-    uint8_t *output,
-    size_t capacity,
-    size_t &written) const
+    String &buffer) const
 {
-  written = 0;
   const bool shifted = report.modifier.left_shift || report.modifier.right_shift;
   uint8_t value = 0;
 
@@ -71,10 +68,8 @@ KeyMapResult EnglishKeyboardLayout::mapKey(
       value = '.';
       break;
     default:
-      return KeyboardLayout::mapKey(key, report, output, capacity, written);
+      return KeyboardLayout::mapKey(key, report, buffer);
     }
   }
-  return appendByte(value, output, capacity, written)
-             ? KeyMapResult::Mapped
-             : KeyMapResult::BufferTooSmall;
+  return appendByte(buffer, value);
 }

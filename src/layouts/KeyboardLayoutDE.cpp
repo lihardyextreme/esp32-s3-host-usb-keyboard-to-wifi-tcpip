@@ -6,14 +6,11 @@ const char *GermanKeyboardLayout::name() const
   return "German (DE)";
 }
 
-KeyMapResult GermanKeyboardLayout::mapKey(
+bool GermanKeyboardLayout::mapKey(
     uint8_t key,
     const hid_keyboard_input_report_boot_t &report,
-    uint8_t *output,
-    size_t capacity,
-    size_t &written) const
+    String &buffer) const
 {
-  written = 0;
   const bool shifted = report.modifier.left_shift || report.modifier.right_shift;
   const bool altGr = report.modifier.right_alt;
   uint8_t value = 0;
@@ -33,9 +30,7 @@ KeyMapResult GermanKeyboardLayout::mapKey(
     if (key == HID_KEY_3 && shifted)
     {
       static const uint8_t section[] = {0xC2, 0xA7};
-      return appendBytes(section, sizeof(section), output, capacity, written)
-                 ? KeyMapResult::Mapped
-                 : KeyMapResult::BufferTooSmall;
+      return appendBytes(buffer, section, sizeof(section));
     }
     if (key == HID_KEY_7 && altGr)
       value = '{';
@@ -64,9 +59,7 @@ KeyMapResult GermanKeyboardLayout::mapKey(
       else
       {
         static const uint8_t sharpS[] = {0xC3, 0x9F};
-        return appendBytes(sharpS, sizeof(sharpS), output, capacity, written)
-                   ? KeyMapResult::Mapped
-                   : KeyMapResult::BufferTooSmall;
+        return appendBytes(buffer, sharpS, sizeof(sharpS));
       }
       break;
     case HID_KEY_EQUAL:
@@ -75,17 +68,13 @@ KeyMapResult GermanKeyboardLayout::mapKey(
       else
       {
         static const uint8_t acute[] = {0xC2, 0xB4};
-        return appendBytes(acute, sizeof(acute), output, capacity, written)
-                   ? KeyMapResult::Mapped
-                   : KeyMapResult::BufferTooSmall;
+        return appendBytes(buffer, acute, sizeof(acute));
       }
       break;
     case HID_KEY_OPEN_BRACKET:
     { // ü
       const uint8_t umlaut[] = {0xC3, static_cast<uint8_t>(shifted ? 0x9C : 0xBC)};
-      return appendBytes(umlaut, sizeof(umlaut), output, capacity, written)
-                 ? KeyMapResult::Mapped
-                 : KeyMapResult::BufferTooSmall;
+      return appendBytes(buffer, umlaut, sizeof(umlaut));
     }
     case HID_KEY_CLOSE_BRACKET:
       if (altGr)
@@ -106,24 +95,18 @@ KeyMapResult GermanKeyboardLayout::mapKey(
     case HID_KEY_COLON:
     { // ö
       const uint8_t umlaut[] = {0xC3, static_cast<uint8_t>(shifted ? 0x96 : 0xB6)};
-      return appendBytes(umlaut, sizeof(umlaut), output, capacity, written)
-                 ? KeyMapResult::Mapped
-                 : KeyMapResult::BufferTooSmall;
+      return appendBytes(buffer, umlaut, sizeof(umlaut));
     }
     case HID_KEY_QUOTE:
     { // ä
       const uint8_t umlaut[] = {0xC3, static_cast<uint8_t>(shifted ? 0x84 : 0xA4)};
-      return appendBytes(umlaut, sizeof(umlaut), output, capacity, written)
-                 ? KeyMapResult::Mapped
-                 : KeyMapResult::BufferTooSmall;
+      return appendBytes(buffer, umlaut, sizeof(umlaut));
     }
     case HID_KEY_TILDE: // top left ^°
       if (shifted)
       {
         static const uint8_t degree[] = {0xC2, 0xB0};
-        return appendBytes(degree, sizeof(degree), output, capacity, written)
-                   ? KeyMapResult::Mapped
-                   : KeyMapResult::BufferTooSmall;
+        return appendBytes(buffer, degree, sizeof(degree));
       }
       value = '^';
       break;
@@ -140,10 +123,8 @@ KeyMapResult GermanKeyboardLayout::mapKey(
       value = ',';
       break;
     default:
-      return KeyboardLayout::mapKey(key, report, output, capacity, written);
+      return KeyboardLayout::mapKey(key, report, buffer);
     }
   }
-  return appendByte(value, output, capacity, written)
-             ? KeyMapResult::Mapped
-             : KeyMapResult::BufferTooSmall;
+  return appendByte(buffer, value);
 }
