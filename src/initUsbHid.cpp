@@ -33,7 +33,7 @@ void hid_host_keyboard_report_callback(Keyboard *keyboard, hid_host_device_handl
     Serial.printf("ERROR: size does not match %d != %d \r\n", sizeof(hid_keyboard_input_report_boot_t), length);
     return;
   }
-  keyboard->processKeyboardData(data, length);
+  keyboard->processKeyboardData((hid_keyboard_input_report_boot_t*)data);
 }
 
 void hid_host_mouse_report_callback(Keyboard *keyboad, hid_host_device_handle_t hid_device_handle, const uint8_t *const data, const int length)

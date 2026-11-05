@@ -28,12 +28,11 @@ public:
 
   void setServerContext(ServerContext *context);
   void setDeviceHandle(hid_host_device_handle_t hid_device_handle);
-  uint8_t handleInput(hid_keyboard_input_report_boot_t *input,
-                      uint8_t *pressedKeys, size_t pressedKeysMaxLength);
+  void handleInput(hid_keyboard_input_report_boot_t *input, String &buffer);
   void requestLedState(bool capslock, bool numlock, bool scroll);
   void _requestLedState(uint8_t state);
   void applyLedState();
-  size_t processKeyboardData(const uint8_t *const data, const int length);
+  size_t processKeyboardData(hid_keyboard_input_report_boot_t* data);
 };
 
 #endif

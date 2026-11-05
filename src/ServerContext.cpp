@@ -50,24 +50,24 @@ AsyncClient *ServerContext::getClient()
   return this->client;
 }
 
-size_t ServerContext::sendAsyncString(const char *data)
+size_t ServerContext::sendAsyncString(const char *val)
 {
   if (this->client == nullptr)
   {
     Serial.println("[AsyncServer] sendAsyncString - ignore");
     return 0;
   }
-  Serial.print("[AsyncServer] send:");
-  Serial.println(data);
-  return client->write(data);
+  Serial.printf("[AsyncServer] send: '%c' %d 0x%x\r\n", *val, *val, *val);
+  return client->write(val);
 }
 
-size_t ServerContext::writeBytes(const char *data, size_t size)
+size_t ServerContext::writeBytes(const char *val, size_t size)
 {
   if (client == nullptr)
   {
     Serial.println("[AsyncServer] sendAsyncString - ignore");
     return 0;
   }
-  return client->write(data, size);
+  Serial.printf("[AsyncServer] send %d bytes\r\n", size);
+  return client->write(val, size);
 }

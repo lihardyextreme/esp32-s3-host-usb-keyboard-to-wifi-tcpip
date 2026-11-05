@@ -42,11 +42,11 @@ void Keyboard::setDeviceHandle(hid_host_device_handle_t hid_device_handle)
   applyLedState();
 }
 
-uint8_t Keyboard::handleInput(hid_keyboard_input_report_boot_t *input, uint8_t *pressedKeys, size_t pressedKeysMaxLength)
+void Keyboard::handleInput(hid_keyboard_input_report_boot_t *input, String &buffer)
 {
   const KeyboardLayout *keyboardLayout = getKeyboardLayout(this->getLayout());
   if (keyboardLayout == nullptr)
-    return 0;
+    return;
   uint8_t released = 0;
   for (int ikey = 0; ikey < 256; ikey++)
   {
@@ -74,32 +74,31 @@ uint8_t Keyboard::handleInput(hid_keyboard_input_report_boot_t *input, uint8_t *
       if (input->key[0] == HID_KEY_ESC)
       {
         if (theServerContext == nullptr)
-          return 0;
+          return;
         AsyncClient *client = theServerContext->getClient();
         if (client == nullptr)
-          return 0;
+          return;
         if (client->connected())
           client->close();
-        return 0;
+        return;
       }
       if (input->key[0] == HID_KEY_PAUSE)
       {
         ESP.restart();
-        return 0;
+        return;
       }
       if (input->key[0] == HID_KEY_E)
       {
         setLayout(LAYOUT_EN);
-        return 0;
+        return;
       }
       if (input->key[0] == HID_KEY_D)
       {
         setLayout(LAYOUT_DE);
-        return 0;
+        return;
       }
     }
   }
-  size_t countOfPressedKeys = 0;
   uint8_t pressed = 0;
   for (int i = 0; i < sizeof(input->key); i++)
   {
@@ -129,14 +128,13 @@ uint8_t Keyboard::handleInput(hid_keyboard_input_report_boot_t *input, uint8_t *
       }
       else if (pressed <= HID_KEY_APPLICATION)
       {
-        if (keyboardLayout->premapKey(stateNumLock, pressed, input, pressedKeys, countOfPressedKeys, pressedKeysMaxLength))
+        if (keyboardLayout->premapKey(stateNumLock, pressed, input, buffer))
           continue;
-        if (KeyMapResult::BufferTooSmall == keyboardLayout->mapKey(pressed, *input, pressedKeys, pressedKeysMaxLength, countOfPressedKeys))
-          return countOfPressedKeys;
+        if (keyboardLayout->mapKey(pressed, *input, buffer))
+          continue;
       }
     }
   }
-  return countOfPressedKeys;
 }
 
 void Keyboard::_requestLedState(uint8_t state)
@@ -175,20 +173,22 @@ void Keyboard::applyLedState()
     Serial.printf("applyLedState failed: %d\r\n", err);
 }
 
-size_t Keyboard::processKeyboardData(const uint8_t *const data, const int length)
+size_t Keyboard::processKeyboardData(hid_keyboard_input_report_boot_t* data)
 {
   if (theServerContext == nullptr)
     return 0;
   if (theServerContext->getMode() == 2)
   {
-    uint8_t pressedKeys[6];
-    uint8_t count = handleInput((hid_keyboard_input_report_boot_t *)data, pressedKeys, sizeof(pressedKeys));
-    if (count == 0)
+    String buffer;
+    buffer.reserve(64);
+    handleInput(data, buffer);
+    unsigned int len = buffer.length();
+    if (len == 0)
       return 0;
     size_t sent = 0;
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < len; i++)
     {
-      char ch = (char)pressedKeys[i];
+      char ch = (char)buffer[i];
       String msg;
       msg += ch;
       if (ch == '\r')
@@ -200,15 +200,17 @@ size_t Keyboard::processKeyboardData(const uint8_t *const data, const int length
   if (theServerContext->getMode() == 0)
   {
     const char *ptr = (const char *)data;
-    return theServerContext->writeBytes(ptr, length);
+    return theServerContext->writeBytes(ptr, sizeof(hid_keyboard_input_report_boot_t));
   }
   if (theServerContext->getMode() == 1)
   {
     String msg;
     msg += "keyboard:";
-    for (int i = 0; i < length; i++)
+    unsigned int len = sizeof(hid_keyboard_input_report_boot_t);
+    char* ptr = (char*)data;
+    for (int i = 0; i < len; i++)
     {
-      msg += data[i];
+      msg += ptr[i];
       msg += ",";
     }
     return theServerContext->sendAsyncString(msg.c_str());
