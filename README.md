@@ -27,14 +27,16 @@ password="your-password"
 3. Type on the keyboard (1) and receive the text in the telnet terminal (2)
 4. In order to disconnect type a dot '.' in the telnet terminal (2)
 
-
 ## Special key combinations
 
-- Reboot - (Left-Ctrl) + (Left-Alt) + (Left-Windows-key) + (Break/Pause)
+ESP32 Keyboard (1):
+- Magic combo: (Left-Ctrl) + (Left-Alt) + (Left-Windows-key)
+- Reboot ESP32: (Magic combo) + (Break/Pause)
+- Disconnect ESP32 tcpip client: (Magic combo) + Esc (Escape)
 
 ### Keyboard layout
 
 In order to change the keyboard layout, on the ESP32 keyboard (1) use the following sequences:
 
-- english (default) - (Left-Ctrl) + (Left-Alt) + (Left-Windows-key) + e
-- german (deutsch) - (Left-Ctrl) + (Left-Alt) + (Left-Windows-key) + d
+- english (default): (Magic combo) + e
+- german (deutsch): (Magic combo) + d
